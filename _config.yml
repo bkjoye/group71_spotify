@@ -1,6 +1,6 @@
 theme: jekyll-theme-minimal
-title: Support Vector Olives
-description: Keeping Italian Olives Pure!
+title: Homepage
+description: Harvard CS109A Final Project
 baseurl:
 markdown: kramdown
 kramdown:

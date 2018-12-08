@@ -1,4 +1,7 @@
-
+---
+title: Playlist EDA
+nav_include: 1
+---
 
 
 ```python

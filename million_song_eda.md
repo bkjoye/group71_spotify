@@ -1,4 +1,7 @@
-
+---
+title: Million Song EDA
+nav_include: 2
+---
 
 
 ```python

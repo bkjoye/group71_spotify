@@ -1,5 +1,5 @@
 ---
-title: The Case of the Italian Olives
+title: Spotify Playlist Generation
 ---
 
 This is the home page

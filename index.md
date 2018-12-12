@@ -4,6 +4,12 @@ title: Spotify Playlist Generation
 
 The purpose of this project is to explore methods learned in the CS109A Data Science Course to create a model which can generate Spotify playlists.
 
+Introduction: 
+
+**Spotify** 
+
+Spotify is a music service that offers audio playback over the Internet. It of offers a developer access (https://developer.spotify.com) that allows querying of data and manipulation of user data.
+
 The project has two goals:
 
 **Goal 1: automatic playlist generation**
@@ -14,4 +20,4 @@ Would using playlist engineered features based on songs allow a model creation t
 
 Can similarity be used to add some (how many?) songs to "base" playlist, and proceed with algorithm written for goal 1?
 
-Assumption made for now is that “base” playlist is most important, context information can be used for tie braking and sorting (e.g “studying” – less loud songs)
+Assumption made for now is that “base” playlist is most important and song selection can be made by utilizing "similar" songs and playlists.

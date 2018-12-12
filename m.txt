@@ -1,0 +1,21 @@
+2/10/50/100
+
+
+                        # metrics
+                        metric_match = list(set(train_song_set) & set(song_play))  #  find which songs generated and original playlists have in common
+                        metric_match_n = len(metric_match)                -> this is number of songs which code guessed correctly 
+                        song_agg = np.array(getPlAgg(song_info)) # aggregated to playlist : calc aggregated values from songs to generated playlist
+                        dist = (song_agg - train_agg_info)**2                  -> dist is "distance" between generated playlist and original playlist. just Euclidean distance
+                        dist = np.sum(dist, axis=1)
+                        dist = np.sqrt(dist)[0]
+                        song_numf = round(reg.predict(song_agg.reshape(1, -1))[0])      -> using regression model that was fit on training data, predict number of followers for generated playlist
+                        numf_diff = int(np.abs(train_numf - song_numf)[0])                       --> and calc how different it is from true num_followers
+                        sum_metric = 1.0 / metric_match_n + dist + numf_diff     -> combine these metrics together - invert metric_match to make sure smaller metric is better (i.e. bigger metric_match_n value means sum_metric is smaller)
+
+ 	running through several metaparam variations but processing time is too high to try them out. 
+
+    num_top_pl = 5 # choose top 5 playlists -> this refers to taking songs from only 5 playlists which came from closest cluster (ordered by num_followers, descending) -> dfPlaylistMatch.sort_values(by='num_followers', ascending=False).head(num_top_pl)
+    train_song_id = 0 # first song is used to continue playlist. I don't think this matters which song we pretend on receiving to continue on
+    start_num = 10  # this is number of similar songs to fetch at each step -> goes to getSimSongs(dfSim, song_set, start_num... where similar songs are added recursively - until there are enough or none (some songs really don't have enough similars !)
+    fromsim_n = int(target_n / 2) # metaparam  -> algorithm fills 50% of playlist from similar songs and 50% from clusters. Again, not enough time to explore - should be mentioned in "what's next" section. I.e. it might be better to get more similar songs or from clusters.
+

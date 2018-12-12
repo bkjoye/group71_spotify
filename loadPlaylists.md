@@ -1,7 +1,47 @@
 ---
-title: Playlist EDA
+title: Million Playlist EDA
 nav_include: 1
 ---
+
+#### Original data
+    
+1m playlists along with tracks (songs)/albums/artists which are part of particular playlist. Data is in JSON format, split into 1000 files. After download, we adjusted code provided with the dataset to read, clean and reconcile the data.
+
+#### Problem
+    
+Size. Loaded as-is, this dataset wouldn’t fit into memory (~66m records). Names of songs / artists / playlists are duplicated which is a waste. Therefore, preprocessing utility was adjusted to split data into tables, adding ids for each entry: songs, artists, albums, playlists, tracks. Names were sanitized: brought to lower case, removed leading/trailing space, removed non-ASCII letter symbols, skipped entry if resulting string is empty (some names were
+all-hieroglyphs). This also allowed an easier analysis of tables (i.e. group by names). Even after the data normalization, track data wouldn’t fit into a notebook with 8Gb of RAM. That, plus early results of EDA (~70% of track data belongs to playlists with just 1 follower), led to removing track data that has a single follower. Resulting dataframe fits into RAM.
+
+#### Song details 
+('danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'time_signature') are being downloaded through Spotify’s REST API (using Spotify ID from playlist dataset to reconcile data). It’s a slow and laborious process because authentication token must be re-taken every hour (manually) plus there’s a rate limit (~4 songs per second). At this point, ~90% data has been downloaded.
+
+#### After cleaning and preprocessing :
+* Songs: 1389690. Not all songs are found in Spotify – hence post-join with playlist tracks
+entries which have N/A are dropped. Since this is a rare occurrence, we don’t expect major
+impact on quality. Spotify URI is used to fetch song details (danceability, loudness, etc)
+* Artists: 281893. Names are used to find match in similarity dataset but otherwise only
+having “same” artist (same id) seems to be important for playlists
+* Albums: 547603. Same as artist: use for matching but otherwise track-album id is used
+* Playlists: 984547; after dropping single-follower and top-follower (71643) playlists: 241799
+* Tracks: 65138632; after dropping single-follower playlists: 19822736; after joining to song
+details 18660867 (preliminary - song details download is in-progress)
+
+#### Playlist names 
+
+(17384 unique entries) don’t look descriptive: although some provide context (e.g. decade-related ‘00s’ repeated 219 times, ‘10’ – 175; mood: ‘zone’ - 107 ‘zumba’ – 342, ‘zombie’ - 25), many names look strange (‘zzz’ – 218 times). Until more promising modelling is done, no lexical matching is done on names.
+
+#### Number of playlists by followers
+
+Are heavily skewed by playlists with few followers, details below
+
+#### Engineered features for playlists
+
+Joining back track data with song details and representing playlist by its own data (number of tracks/albums/followers) and aggregating (depending on the field - e.g max mode) of song data per playlist, gives engineered features of the playlist (all fields range 0-1 for modelling) which allows modelling of playlists – e.g. clustering based on these features.
+
+#### PCA 
+
+It was done on these features: 88% of variation is explained by 4 components. Since number of engineered features is not large, PCA is not used in modelling.
+
 
 
 ```python
@@ -412,7 +452,7 @@ ax[1].set_ylabel('Number of playlists');
 
 
 
-![png](loadPlaylists_files/loadPlaylists_9_0.png)
+![png](loadPlaylists_files/loadPlaylists_10_0.png)
 
 
 
@@ -694,7 +734,7 @@ ax.set_ylabel('Number of playlists');
 
 
 
-![png](loadPlaylists_files/loadPlaylists_12_0.png)
+![png](loadPlaylists_files/loadPlaylists_13_0.png)
 
 
 
@@ -710,7 +750,7 @@ ax.set_ylabel('Number of playlists');
 
 
 
-![png](loadPlaylists_files/loadPlaylists_13_0.png)
+![png](loadPlaylists_files/loadPlaylists_14_0.png)
 
 
 

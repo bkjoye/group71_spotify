@@ -1,3 +1,24 @@
+• http://recsys-challenge.spotify.com/
+• Large (5.4 GB) Playlist dataset from Spotify
+
+2. Million Song Dataset
+• https://labrosa.ee.columbia.edu/millionsong/lastfm
+• Generated in 2010/2011 (but you can use last.fm to regenerate)
+
+Spotify API
+
+Berenzweig, Adam, Beth Logan, Daniel P.W. Ellis and Brian Whitman. A
+Large-Scale Evaluation of Acoustic and Subjective Music Similarity
+Measures. Proceedings of the ISMIR International Conference on Music
+Information Retrieval (Baltimore, MD), 2003,
+
+https://www.researchgate.net/profile/Beth_Logan/publication/220722880_Content-Based_Playlist_Generation_Exploratory_Experiments/links/5429f1bf0cf27e39fa8e6c90/Content-Based-Playlist-Generation-Exploratory-Experiments.pdf
+
+Shedl, M. et al, Current Challenges and Visions in Music Recommender
+Systems Research, https://arxiv.org/pdf/1710.03208.pdf
+
+
+
 2/10/50/100
 
 

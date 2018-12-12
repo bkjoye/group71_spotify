@@ -1,5 +1,5 @@
 ---
-title: DataProcurementAndProcessing
+title: Data Procurement And Processing
 nav_include: 3
 ---
 

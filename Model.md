@@ -1,15 +1,45 @@
 ---
 title: Modelling
-nav_include: 4
+nav_include: 5
 ---
 
 ### Modelling
 
-We use the following three components for modelling:
-* Similar songs lookup (recursive)
-* Regression model that estimates number of followers
-* KMeans clustering on playlist engineered features to add songs from playlists which belong to the same centroid as the "base" playlist 
+The goal is to create a playlist, starting from one song, as this could be easily extended to starting from multiple songs. Dataset is split into three parts:
 
+* Training
+* Validation
+* Test
+
+(please see "Splitting Data" page for details)
+
+We use the following three components for modelling:
+
+* Similar songs lookup (recursive)
+* Regression model that estimates number of followers (coefficients calculated based on training dataset)
+* KMeans clustering on playlist engineered features to add songs from playlists which belong to the same centroid as the "base" playlist. "Top" similar (belonging to the same cluster, ordered by number of followers, descending) playlists are used to supply songs (chosen at random)
+
+`Metrics`:
+* Find which songs generated and original playlists have in common and calculate number of songs which code guessed correctly 
+* Calculate aggregated (engineered) values from songs to generated playlist and come up with (Euclidean) "distance" between generated playlist and original playlist
+* Using regression model that was fit on training data, predict number of followers for generated playlist and calculate how different it is from true num_followers
+* Sum these metrics together to find the loss but invert number of song matches to make sure smaller metric is better
+
+`Metaparameters`
+* Number of clusters. We tried 2 / 10 / 50 / 100 cluster splits
+* Number of playlists (5) to choose songs from the same cluster. Refers to taking songs from only 5 playlists which came from closest cluster (ordered by num_followers, descending)
+* Number of similar songs (10) to fetch at each step. Similar songs are added recursively (i.e. add 10 songs, go through them to find similar songs for each in order) - until there are enough or none can be taken
+* Algorithm fills 50% of playlist from similar songs and 50% from clusters. If there were only a few similar songs for the first phase - similar songs are also taken from the list of songs from clusters
+
+It would be great to run through several metaparam variations but processing time is too high to try that out. Only variation of number of clusters was done. There was not enough time to find out if splitting similar songs / playlists should be done not 50 / 50 but in different proportion
+
+`Execution`
+* It turned out that playlist generation is pretty slow - running through 500 playlists takes an hour. Hence, code splits (after shuffling) the input dataset into "batches" and runs analysis in parallel
+* Each run (train / validation / test) saves results into separate compressed csv files - by batch and by cluster size metaparameter
+
+`Programmatically`, code is very similar for train / validation and test. Major differences:
+* Regression model for number of followers is trained based on training dataset and applied for all datasets
+* Training is limited to 1000 playlists in each of 6 threads calculated in paralllel. This allows validation and training datasets sizes to be roughly equivalent. Below is the script for training.
 
 
 

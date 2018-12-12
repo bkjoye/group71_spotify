@@ -1,3 +1,7 @@
+---
+title: Million Playlist EDA
+nav_include: 1
+---
 
 #### Original data
     

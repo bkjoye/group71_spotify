@@ -8,7 +8,7 @@ Introduction:
 
 **Spotify** 
 
-Spotify is a music service that offers audio playback over the Internet. It of offers a developer access (https://developer.spotify.com) that allows querying of data and manipulation of user data.
+Spotify is a music service that offers audio playback over the Internet. It offers a developer access (https://developer.spotify.com) that allows querying of data and manipulation of user data. Users benefit from listening to the music and create playlists which can be followed by other users. Spotify provides access to some of the datasets and is interested in improvement of auto-generation of playlists.
 
 The project has two goals:
 
@@ -18,6 +18,6 @@ Would using playlist engineered features based on songs allow a model creation t
 
 **Goal 2: cold start**
 
-Can similarity be used to add some (how many?) songs to "base" playlist, and proceed with algorithm written for goal 1?
+Can similarity be used to add songs to "base" playlist, and proceed with algorithm written for goal 1?
 
-Assumption made for now is that “base” playlist is most important and song selection can be made by utilizing "similar" songs and playlists.
+Assumption made is that “base” playlist is most important and song selection can be made by utilizing "similar" songs and playlists. In the model created for this projects, these goals are combined. I.e. using a "nucleus" song, we first (recursively) add similar songs (calculated and stored ahead of time for all known songs) and then add songs from "close" ("similar") playlists. Playlist closeness is calculated through KMeans clustering on engineered features which are aggregation of songs' features in the playlist.

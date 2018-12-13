@@ -15,6 +15,16 @@ Initially we planned on aggregating the results of the batches and then comaring
 
 In order to try and compare models with the metrics we already have, we combined the means of each batch along with the standard deviation of the means for each metric and compared those values. This led to some strange results, with the validation and test sets consistently outperforming the train set for each metric. However when you look at the $\pm 2\sigma $ bounds on the scores, you can see that there is significant overlap. 
 
+#### Results summary
+
+* Our model generates playlists, even matches some of the original songs in playlist from which only 1 song is taken! I.e. it addresses both goals set out for the project
+* Scoring and analysis shows that clustering and song similarity is a viable approach. Visial inspection shows that playlists seem to make sense (i.e. follow the "theme" of nucleus song)
+* There's still variance in results which means there's room for improvement. A lot of variance come from estimated number of followers which is a metric that is subject to Spotify promotion and "hit" phenomena
+
+**Future work**
+
+Extension would be to test other metaparameters listed in "Modelling". Added song tags and experimenting with words (lyrics, playlist names) would be helpful. An interesting approach would be great to try - TF/IDF and collaborative filtering which were used in https://ieatyanyans.github.io/music-recommender/
+
 
 
 ```python

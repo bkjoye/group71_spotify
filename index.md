@@ -25,3 +25,8 @@ Would using playlist engineered features based on songs allow a model creation t
 Can similarity be used to add songs to "base" playlist, and proceed with algorithm written for goal 1?
 
 Assumption made is that “base” playlist is most important and song selection can be made by utilizing "similar" songs and playlists. In the model created for this projects, these goals are combined. I.e. using a "nucleus" song, we first (recursively) add similar songs (calculated and stored ahead of time for all known songs) and then add songs from "close" ("similar") playlists. Playlist closeness is calculated through KMeans clustering on engineered features which are aggregation of songs' features in the playlist.
+
+`Team Group 71:`
+
+* Brandon Joye
+* Vladimir Yelizarov

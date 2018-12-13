@@ -1,7 +1,21 @@
 ---
 title: Modelling Results
-nav_include: 5
+nav_include: 7
 ---
+
+**Analysis Approach:**
+
+Since our model runs took a very long time, we saved all of our metrics into dataframes to be loaded for later analysis. Each metric has six different values for each metric, based on the mean of that metric for the results of that batch. 
+
+**Initial Approach** 
+
+Initially we planned on aggregating the results of the batches and then comaring the different model results. However we found that the way we created our metrics gave us results with very high variability. If we were able to run the models again, we would change the metrics to be proportions of change, i.e. %change in followers vs the current method of absolute change in followers. This would normalize our data and allow us to directly compare results on playlists with large differences in number of songs and number of followers.
+
+**Compromise Approach** 
+
+In order to try and compare models with the metrics we already have, we combined the means of each batch along with the standard deviation of the means for each metric and compared those values. This led to some strange results, with the validation and test sets consistently outperforming the train set for each metric. However when you look at the $\pm 2\sigma $ bounds on the scores, you can see that there is significant overlap. 
+
+
 
 ```python
 import sys
@@ -16,7 +30,7 @@ import csv
 import matplotlib
 import matplotlib.pyplot as plt
 
-DATA_DIR="data"
+DATA_DIR="../../../data"
 ```
 
 
@@ -86,17 +100,17 @@ v100 = readResults(100, "v", "validate")
 
 
 ```python
-v2df = readResults2(2, "v", "validate")
-v10df = readResults2(10, "v", "validate")
-v50df = readResults2(50, "v", "validate")
-v100df = readResults2(100, "v", "validate")
+t2df = readResults2(2, "t", "train")
+t10df = readResults2(10, "t", "train")
+t50df = readResults2(50, "t", "train")
+t100df = readResults2(100, "t", "train")
 ```
 
 
 
 
 ```python
-v2df.agg([np.mean, np.std])
+t2df.agg([np.mean, np.std])
 ```
 
 
@@ -134,25 +148,25 @@ v2df.agg([np.mean, np.std])
   <tbody>
     <tr>
       <th>mean</th>
-      <td>492042.461959</td>
+      <td>492621.840113</td>
       <td>2.0</td>
       <td>10.0</td>
-      <td>32.021612</td>
-      <td>6.221405</td>
-      <td>23.265770</td>
-      <td>6.924944</td>
-      <td>8.386562</td>
+      <td>41.498213</td>
+      <td>6.019840</td>
+      <td>23.742583</td>
+      <td>6.903134</td>
+      <td>17.367623</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>284228.286898</td>
+      <td>284337.026741</td>
       <td>0.0</td>
       <td>0.0</td>
-      <td>119.640744</td>
-      <td>5.471107</td>
-      <td>20.640215</td>
-      <td>2.113651</td>
-      <td>117.883677</td>
+      <td>719.542719</td>
+      <td>5.571262</td>
+      <td>27.351196</td>
+      <td>1.296133</td>
+      <td>719.121609</td>
     </tr>
   </tbody>
 </table>
@@ -164,38 +178,14 @@ v2df.agg([np.mean, np.std])
 
 ```python
 fig, ax = plt.subplots(1,4,figsize=(20,5))
-v2df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[0])
+t2df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[0])
 ax[0].set_title('Metric Variability of 2 Cluster Model')
-v10df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[1])
+t10df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[1])
 ax[1].set_title('Metric Variability of 10 Cluster Model')
-v50df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[2])
+t50df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[2])
 ax[2].set_title('Metric Variability of 50 Cluster Model')
-v100df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[3])
+t100df.drop(['playlist_id', 'n_clusters', 'start_num'], axis=1).boxplot(ax=ax[3])
 ax[3].set_title('Metric Variability of 100 Cluster Model')
-fig.suptitle('Comparison of Metric Variability for Each Model')
-fig.tight_layout(rect=[0, 0, 1, .95])
-plt.show()
-```
-
-
-
-![png](display_resultsv2_files/display_resultsv2_6_0.png)
-
-
-
-
-```python
-fig, ax = plt.subplots(1,4,figsize=(20,5))
-ax[0].boxplot(v2df.match)
-ax[0].set_title('Metric Variability of 2 Cluster Model')
-ax[1].boxplot(v10df.match)
-ax[1].set_title('Metric Variability of 10 Cluster Model')
-ax[2].boxplot(v50df.match)
-ax[2].set_title('Metric Variability of 50 Cluster Model')
-ax[3].boxplot(v100df.match)
-ax[3].set_title('Metric Variability of 100 Cluster Model')
-for axis in ax:
-    axis.set_xticklabels('')
 fig.suptitle('Comparison of Metric Variability for Each Model')
 fig.tight_layout(rect=[0, 0, 1, .95])
 plt.show()
@@ -206,17 +196,67 @@ plt.show()
 ![png](display_resultsv2_files/display_resultsv2_7_0.png)
 
 
+The above plots show that there is significant variability in each metric, this is most pronounced in the difference in predicted followers vs actual followers metric.
+
 
 
 ```python
 fig, ax = plt.subplots(1,4,figsize=(20,5))
-ax[0].boxplot(v2df.numf)
+t2df.drop(['playlist_id', 'n_clusters', 'start_num', 'metric', 'diff'], axis=1).boxplot(ax=ax[0])
+ax[0].set_title('Metric Variability of 2 Cluster Model')
+t10df.drop(['playlist_id', 'n_clusters', 'start_num', 'metric', 'diff'], axis=1).boxplot(ax=ax[1])
+ax[1].set_title('Metric Variability of 10 Cluster Model')
+t50df.drop(['playlist_id', 'n_clusters', 'start_num', 'metric', 'diff'], axis=1).boxplot(ax=ax[2])
+ax[2].set_title('Metric Variability of 50 Cluster Model')
+t100df.drop(['playlist_id', 'n_clusters', 'start_num', 'metric', 'diff'], axis=1).boxplot(ax=ax[3])
+ax[3].set_title('Metric Variability of 100 Cluster Model')
+fig.suptitle('Comparison of Metric Variability for Each Model')
+fig.tight_layout(rect=[0, 0, 1, .95])
+plt.show()
+```
+
+
+
+![png](display_resultsv2_files/display_resultsv2_9_0.png)
+
+
+The distance between playlists also has significant variability, one way we could possibly reduce this is to normalize the distance variables so that distance is a number between 0 and 1. 
+
+
+
+```python
+fig, ax = plt.subplots(1,4,figsize=(20,5))
+ax[0].boxplot(t2df.match)
+ax[0].set_title('Metric Variability of 2 Cluster Model')
+ax[1].boxplot(t10df.match)
+ax[1].set_title('Metric Variability of 10 Cluster Model')
+ax[2].boxplot(t50df.match)
+ax[2].set_title('Metric Variability of 50 Cluster Model')
+ax[3].boxplot(t100df.match)
+ax[3].set_title('Metric Variability of 100 Cluster Model')
+for axis in ax:
+    axis.set_xticklabels('')
+fig.suptitle('Comparison of Metric Variability for Each Model')
+fig.tight_layout(rect=[0, 0, 1, .95])
+plt.show()
+```
+
+
+
+![png](display_resultsv2_files/display_resultsv2_11_0.png)
+
+
+
+
+```python
+fig, ax = plt.subplots(1,4,figsize=(20,5))
+ax[0].boxplot(t2df.numf)
 ax[0].set_title('Predicted Followers Variability of 2 Cluster Model')
-ax[1].boxplot(v10df.numf)
+ax[1].boxplot(t10df.numf)
 ax[1].set_title('Predicted Followers Variability of 10 Cluster Model')
-ax[2].boxplot(v50df.numf)
+ax[2].boxplot(t50df.numf)
 ax[2].set_title('Predicted Followers Variability of 50 Cluster Model')
-ax[3].boxplot(v100df.numf)
+ax[3].boxplot(t100df.numf)
 ax[3].set_title('Predicted Followers Variability of 100 Cluster Model')
 for axis in ax:
     axis.set_xticklabels('')
@@ -227,7 +267,7 @@ plt.show()
 
 
 
-![png](display_resultsv2_files/display_resultsv2_8_0.png)
+![png](display_resultsv2_files/display_resultsv2_12_0.png)
 
 
 
@@ -597,7 +637,7 @@ plt.show()
 
 
 
-![png](display_resultsv2_files/display_resultsv2_14_0.png)
+![png](display_resultsv2_files/display_resultsv2_18_0.png)
 
 
 
@@ -618,11 +658,11 @@ po, results_train[po+'std']
 
 
 
-    ('diff', t2      19.586043
-     t10     19.232502
-     t50     19.268623
-     t100    19.445556
-     Name: diffstd, dtype: float64)
+    ('metric2', t2      1.202147
+     t10     0.934653
+     t50     0.903429
+     t100    0.689577
+     Name: metric2std, dtype: float64)
 
 
 
@@ -666,7 +706,7 @@ plt.show()
 
 
 
-![png](display_resultsv2_files/display_resultsv2_17_0.png)
+![png](display_resultsv2_files/display_resultsv2_21_0.png)
 
 
 
@@ -695,8 +735,10 @@ plt.show()
 
 
 
-![png](display_resultsv2_files/display_resultsv2_18_0.png)
+![png](display_resultsv2_files/display_resultsv2_22_0.png)
 
+
+Looking at the combined metric by batch shows that each model reacted to the individual batches in a fairly consistent manner. This is slightly less true for the validation set, but the relationship is still there for at least the 10, 50 and 100 cluster models.
 
 
 
@@ -731,5 +773,7 @@ plt.show()
 
 
 
-![png](display_resultsv2_files/display_resultsv2_19_0.png)
+![png](display_resultsv2_files/display_resultsv2_24_0.png)
 
+
+We created a second combined metric aimed at reducing the variability, this metric has results that are more in line with expectations with the model performing slightly better on the train set than the other sets. 

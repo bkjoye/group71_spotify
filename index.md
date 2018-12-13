@@ -11,6 +11,7 @@ Introduction:
 Spotify is a music service that offers audio playback over the Internet. It offers a developer access (https://developer.spotify.com) that allows querying of data and manipulation of user data. Users benefit from listening to the music and create playlists which can be followed by other users. 
 
 **Motivation**
+
 Spotify provides access to some of the datasets and is interested in improvement of auto-generation of playlists. Playlists which were generated in the past are available but a user might want a playlists that hasn't been created before. I.e., get a new sequence of songs right after listening to one or more songs. And have songs which actually fit the occasion.
 
 The project has two goals:

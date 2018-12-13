@@ -1,5 +1,5 @@
 ---
-title: Million Song Dataset
+title: Million Song EDA
 nav_include: 2
 ---
 

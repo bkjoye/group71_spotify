@@ -1,4 +1,3 @@
-
 ---
 title: Splitting Data
 nav_include: 4

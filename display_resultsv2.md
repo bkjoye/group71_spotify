@@ -1,3 +1,4 @@
+
 ---
 title: Modelling Results
 nav_include: 7
@@ -18,7 +19,7 @@ In order to try and compare models with the metrics we already have, we combined
 #### Results summary
 
 * Our model generates playlists, even matches some of the original songs in playlist from which only 1 song is taken! I.e. it addresses both goals set out for the project
-* Scoring and analysis shows that clustering and song similarity is a viable approach. Visial inspection shows that playlists seem to make sense (i.e. follow the "theme" of nucleus song)
+* Scoring and analysis shows that clustering and song similarity is a viable approach. Visual inspection shows that playlists seem to make sense (i.e. follow the "theme" of nucleus song)
 * There's still variance in results which means there's room for improvement. A lot of variance come from estimated number of followers which is a metric that is subject to Spotify promotion and "hit" phenomena
 
 **Future work**

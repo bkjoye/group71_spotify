@@ -1,7 +1,28 @@
 ---
-title: Million Song EDA
+title: Million Song Dataset
 nav_include: 2
 ---
+
+**Introduction:**
+
+*The Million Song dataset* contains information on each song such as artist, track title, timestamp
+of when the song was added to the database, a list of tags, a list of similar songs, and an Echo
+Nest track id.
+
+**Reconciling Data with Million Playlist Dataset:**
+
+Unfortunately the Echo Nest API has been shutdown, so the main challenge in dealing with this
+dataset is to find a way to correlate Echo Nest track id’s with Spotify id’s. We have tried a few
+methods, but so far have been unsuccessful. The first method was to attempt to search the
+Spotify Web API for each artist and track name then populate the Spotify ID. While this did work
+in a few cases, the API frequently returned no results even when there should be a match.
+
+The next attempt was to match the song and artist names in each dataset in order to build a map between them. This method was slow and did not provide a high number of matches. 
+
+We then moved on to starting with the Spotify song data that we already downloaded and obtaining the data from the last.fm API for that song directly. This method had a very high success rate, but it was very time consuming. The last.fm API would not match the cleaned song and artist names, so we had to redownload the song name and artist name from the Spotify API using the Spotify ID. This process would have taken several weeks to complete. 
+
+Since we were unable to match the Million Song data with the Spotify data, we were not able to incorporate the information into our model.
+
 
 
 ```python
@@ -212,7 +233,7 @@ plt.show()
 
 
 
-![png](million_song_eda_files/million_song_eda_8_0.png)
+![png](million_song_eda_files/million_song_eda_9_0.png)
 
 
 
@@ -339,7 +360,7 @@ plt.show()
 
 
 
-![png](million_song_eda_files/million_song_eda_12_0.png)
+![png](million_song_eda_files/million_song_eda_13_0.png)
 
 
 
@@ -436,4 +457,65 @@ pd.DataFrame(data, columns=['Tag', 'Usage Count'], index=np.arange(1,11))
 </table>
 </div>
 
+
+
+Below is the code that was used to scrape the Spotify Song information from the last.fm API. It makes use of the pylast and spotipy libraries.
+
+
+
+```python
+tags_list = []
+songs_list = []
+similars_list = []
+missed_count = 0
+track_not_found = []
+with gzip.open('data/lastfm/songs.csv.gz', 'wt') as fs:
+    writer_s = csv.writer(fs, delimiter=',')
+    writer_s.writerow(df_songs.columns.tolist()+['Listeners'])
+    with gzip.open('data/lastfm/tags.csv.gz', 'wt') as ft:
+        writer_t = csv.writer(ft, delimiter=',')
+        writer_t.writerow(['id', 'tag', 'weight'])
+        with gzip.open('data/lastfm/similars.csv.gz', 'wt') as f:
+            writer = csv.writer(f, delimiter=',')
+            writer.writerow(['id', 'id_similar', 'similarity'])
+            for pidpos_id in df_key['pidpos_id'].values:
+            #     artist = df_artists['name'].iloc[df_key['artist_id'].iloc[pidpos_id]]
+            #     song = df2_songs['name'].iloc[df_key['track_id'].iloc[pidpos_id]]
+                spotify_id = df2_songs['uri'].iloc[df_key['track_id'].iloc[pidpos_id]]
+                song_id = df2_songs['id'].iloc[df_key['track_id'].iloc[pidpos_id]]
+                try:
+                    sp_track = sp.track(spotify_id)
+                except:
+                    token = util.prompt_for_user_token(sp_user,'user-library-read', client_id, client_secret, callback_url)
+                    sp = spotipy.Spotify(auth=token)
+                    sp_track = sp.track(spotify_id)
+                artist = sp_track['album']['artists'][0]['name']
+                song = sp_track['name']
+                track = last.get_track(artist, song)
+                try:
+                    top_tags = track.get_top_tags()
+                    for top_tag in top_tags:
+                        if np.int(top_tag.weight) >= 50:
+                            #tags_list.append([spotify_id, top_tag.item.get_name(), top_tag.weight])
+                            writer_t.writerow([song_id, top_tag.item.get_name(), top_tag.weight])
+                    #print(top_tag.item.get_name(), top_tag.weight, track.get_listener_count())
+                    #songs_list.append([spotify_id, artist, song, track.get_listener_count()])
+                    writer_s.writerow(df_songs.iloc[song_id].values.tolist()+[track.get_listener_count()])
+                    similars = track.get_similar()
+                    for similar in similars:
+                        try:
+                            if similar.match >= .5:
+                                match_name = cleanString(similar.item.get_name())
+                                match_id = df2_songs[df2_songs['name']==match_name].id.values[0]
+                                #similars_list.append([spotify_id, match_id, similar.match])
+                                writer.writerow([song_id, match_id, similar.match])
+                        except:
+                            missed_count += 1
+                except Exception as e:
+    #                 print('Track '+song+' by '+artist+' not found')
+                    print(e)
+                    if e == 'Track not found':
+                        track_not_found.append(song_id)
+print('Missed: %d' % missed_count)
+```
 
